@@ -1,0 +1,47 @@
+import secrets
+"""
+Я использую secrets, а не random, потому что
+secrets выбирает реально случайную цифру (из системного криптографического источника случайности)
+этим он и отличается от random (берет случайное число по seed, который злоумышленик может узнать, получив доступ к серверу)
+"""
+
+
+def validate_pin(pin):
+    # Проверяет PIN-код по правилам задания.
+
+    # PIN должен состоять ровно из четырёх цифр.
+    if len(pin) != 4 or not pin.isdigit():
+        return False
+
+    # Запрещаем PIN-коды из одинаковых цифр.
+    if pin == pin[0] * 4:
+        return False
+
+    # Запрещаем последовательности вроде 1234 и 6789.
+    if all(int(pin[i + 1]) == int(pin[i]) + 1
+           for i in range(3)):
+        return False
+
+    return True
+
+
+def generate_pin():
+    # Генерирует случайный допустимый PIN-код.
+
+    while True:
+        # Выбираем четыре цифры независимо друг от друга.
+        pin = ''.join(secrets.choice('0123456789')
+                      for _ in range(4))
+
+        if validate_pin(pin):
+            return pin
+
+
+if __name__ == "__main__":
+    # точка входа
+    
+    pin = generate_pin()
+
+    print("Сгенерированный PIN-код:", pin)
+    print("Проверка:", "пройдено" if validate_pin(pin)
+          else "не пройдена")
